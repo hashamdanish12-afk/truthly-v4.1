@@ -1,39 +1,71 @@
-import { useState, useEffect } from 'react'
+import React from "react";
 
-function extractImageFromDescription(desc){
-  if(!desc) return null
-  const m = desc.match(/<img[^>]+src=['\"]([^'\"]+)['\"]/i)
-  return m? m[1] : null
-}
+const NewsCard = ({ article }) => {
+  if (!article) return null;
 
-export default function NewsCard({ item }){
-  const [liked, setLiked] = useState(false)
-  const [likes, setLikes] = useState(0)
-  useEffect(()=>{
-    const key = 'likes:'+ (item.link||item.title).slice(0,80)
-    const stored = localStorage.getItem(key)
-    if(stored) setLikes(parseInt(stored,10))
-  },[item])
-  function toggleLike(){
-    const key = 'likes:'+ (item.link||item.title).slice(0,80)
-    const newLikes = liked? Math.max(0, likes-1) : likes+1
-    setLiked(!liked); setLikes(newLikes)
-    localStorage.setItem(key, String(newLikes))
+  const {
+    title,
+    link,
+    description,
+    image,
+    source,
+    pubDate,
+  } = article;
+
+  // Safe title & link handling
+  const safeTitle = typeof title === "string" ? title : "Untitled Article";
+  const safeLink = typeof link === "string" ? link : "#";
+
+  // Handle missing or non-string images
+  let imageUrl = null;
+  if (typeof image === "string" && image.startsWith("http")) {
+    imageUrl = image;
+  } else {
+    // Fallback to placeholder (you can replace with your logo)
+    imageUrl = "/placeholder.jpg";
   }
-  const img = item.enclosure || extractImageFromDescription(item.description) || item.thumbnail || null
+
+  // Clean and limit description
+  const cleanDescription =
+    typeof description === "string"
+      ? description.replace(/(<([^>]+)>)/gi, "").slice(0, 180) + "..."
+      : "";
+
   return (
-    <article className="card">
-      {img && <div className="thumb"><img src={img} alt=""/></div>}
-      <div className="card-body">
-        <h3 className="card-title">{item.title}</h3>
-        <p className="card-desc">{item.description ? item.description.replace(/<[^>]*>?/gm, '').slice(0,220) : ''}</p>
-        <div className="card-foot">
-          <a className="read" href={item.link|| '#'} target="_blank" rel="noreferrer">Read</a>
-          <div className="engage">
-            <button onClick={toggleLike} className={liked? 'liked':''}>👍 {likes}</button>
-          </div>
+    <a
+      href={safeLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-[#0a0a0a]/70 hover:bg-[#1a1a1a] text-gray-200 border border-gray-800 rounded-2xl overflow-hidden shadow-md transition-transform transform hover:scale-[1.01]"
+    >
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt={safeTitle}
+          className="w-full h-48 object-cover"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/placeholder.jpg";
+          }}
+        />
+      )}
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-gray-100 mb-2 line-clamp-2">
+          {safeTitle}
+        </h2>
+        <p className="text-gray-400 text-sm mb-3 line-clamp-3">
+          {cleanDescription}
+        </p>
+        <div className="flex justify-between text-xs text-gray-500">
+          <span>{source || "Unknown Source"}</span>
+          <span>
+            {pubDate ? new Date(pubDate).toLocaleDateString() : ""}
+          </span>
         </div>
       </div>
-    </article>
-  )
-}
+    </a>
+  );
+};
+
+export default NewsCard;
+

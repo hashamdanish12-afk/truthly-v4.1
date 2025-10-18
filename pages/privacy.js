@@ -1,0 +1,2 @@
+import Navbar from '../components/Navbar'
+export default function Privacy(){return (<div><Navbar/><main className='container'><h1 className='page-title'>Privacy</h1><p>We don't store personal data unless you post. Local likes/comments saved in browser.</p></main></div>)}

@@ -1,0 +1,2 @@
+import Navbar from '../components/Navbar'
+export default function About(){return (<div><Navbar/><main className='container'><h1 className='page-title'>About Truthly</h1><p>Truthly is an independent aggregator focused on raw voices and trending culture.</p></main></div>)}

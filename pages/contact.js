@@ -1,0 +1,2 @@
+import Navbar from '../components/Navbar'
+export default function Contact(){return (<div><Navbar/><main className='container'><h1 className='page-title'>Contact</h1><p>Email: hello@truthly.example</p></main></div>)}
